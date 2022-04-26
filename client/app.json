@@ -5,6 +5,16 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.itsonmeet",
+      "buildNumber": "1.0.1",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Selected photo will be used as your profile picture and will be shown to other users in the app.",
+        "NSCameraUsageDescription": "Selected photo will be used as your profile picture and will be shown to other users in the app."
+      }
+    }
+    
   }
 }
