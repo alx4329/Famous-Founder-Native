@@ -23,7 +23,8 @@ const styles = StyleSheet.create({
         borderWidth: responsiveHeight(0.4),
         borderColor: '#3843D0',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        padding: responsiveHeight(5),
     },    
     text:{
         fontFamily:'roboto-bold',
@@ -31,8 +32,9 @@ const styles = StyleSheet.create({
         
     },
     img:{
-        width:responsiveWidth(10),
-        height:responsiveWidth(10),
+        width:responsiveHeight(8),
+        height:responsiveHeight(8),
+        margin:responsiveHeight(1),
     }
 })
 
