@@ -1,11 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View,Modal, Pressable, Image } from 'react-native';
-import {
-    responsiveHeight,
-    responsiveWidth,
-    } from "react-native-responsive-dimensions";
+import { responsiveHeight, responsiveWidth,} from "react-native-responsive-dimensions";
 import DragZone from '../../components/DragZone.js';
 import * as ImagePicker from 'expo-image-picker'
+import * as ImageManipulator from "expo-image-manipulator";
 import camera from '../../assets/icons/photo_camera.png';
 import gallery from '../../assets/icons/gallery.png';
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,20 +21,67 @@ const Home = ()=>{
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1
+        quality: 1,
+        base64: true,
     }
+    const _compressImage = async (image, base64) => {
+        const desiredWidth = 500;
+        const desiredHeight = 500;
+        // let expectedImageSize = { width: 500, height: 500 };
+        let expectedImageSize = { width: image.width, height: image.height };
     
-    
+        if (image.width > desiredWidth || image.height > desiredHeight) {
+          //try this one with an image taken from camera
+            const widthRatio = image.width / desiredWidth;
+            const heightRatio = image.height / desiredHeight;
+            const ratioToUse = Math.max(widthRatio, heightRatio)
+            expectedImageSize = {
+                width: image.width / ratioToUse,
+                height: image.height / ratioToUse,
+            };
+        }
+        const manipResult = await ImageManipulator.manipulateAsync(
+            image.localUri || image.uri,
+            [{ resize: expectedImageSize }],
+            { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64 }
+          );
+          return manipResult;
+        };
     const openGallery = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({cameraOptions})
-        console.log(result)
-        if (!result.cancelled) dispatch(setFamousImage(result.uri))
+        console.log("GALLERY URI", result.uri, result.base64)
+        if (!result.cancelled) {
+            const compressedImage = await _compressImage(result, true);
+            const filename = compressedImage.uri.split("ImageManipulator/")[1];
+            let selectedFile;
+            if (compressedImage.base64) {
+                const base64 = compressedImage.base64;
+                selectedFile = {
+                uri: compressedImage.uri,
+                name: filename,
+                type: "image/JPEG",
+                base64,
+                };
+                dispatch(setFamousImage(selectedFile))
+
+            } else {
+                const selectedFile = {
+                uri: compressedImage.uri,
+                name: filename,
+                type: "image/JPEG",
+                };
+                dispatch(setFamousImage(selectedFile))
+            }
+                
+            
+            }
     }
 
     const launchCamera = async () => {
         const result= await ImagePicker.launchCameraAsync(cameraOptions)
-         console.log(result);
-            if (!result.cancelled) dispatch(setFamousImage(result.uri))
+         console.log("camera result",result);
+            if (!result.cancelled) dispatch(setFamousImage(result))
+
     }
     const openCamera =  async() =>{
         if(status.granted){
@@ -79,6 +124,19 @@ const Home = ()=>{
                         <View style={styles.modalView}>
                             <View style={styles.topBar} />
                             <Text style={styles.modalTitle}>Selecciona una foto</Text>
+                                    {
+                                        image?.base64 &&
+                                        <Image 
+                                        onLoadStart={()=>{console.log('cargando')}}
+                                        source={{uri:'data:image/jpeg;base64,' + image.base64 ,  }} 
+                                        resizeMode="contain"
+                                        style={styles.modalImage}
+                                        />
+                                    }
+                                
+
+                                
+                            
                             <Pressable
                                 style={[styles.button]}
                                 onPress={()=>openGallery()}
@@ -157,7 +215,8 @@ const styles = StyleSheet.create({
       },
         modalView: {
             width: '100%',
-            height: '27%',
+            // height: '27%',
+            height: 'auto',
             backgroundColor: "#fff",
             borderTopLeftRadius: responsiveWidth(6),
             borderTopRightRadius: responsiveWidth(6),
@@ -186,9 +245,30 @@ const styles = StyleSheet.create({
             color: "#0F172A",
             fontSize: responsiveHeight(2.2),
           },
-          icon:{
-            width:responsiveWidth(6),
-            height:responsiveWidth(6),
+        icon:{
+        width:responsiveWidth(6),
+        height:responsiveWidth(6),
+        },
+        // imageSize: {
+        //     backgroundColor: "#F5F5F5",
+            
+        //     // margin:60,
+            
+           
+           
+            
+            
+        // },
+        modalImage:{
+            width:responsiveWidth(46), 
+            height:responsiveWidth(46),
+            borderRadius:responsiveHeight(3),
+            // position: 'absolute',
+            // top: 0,
+            // left: 0,
+            // bottom: 0,
+            // right: 0,
+            
         },
         button:{
             paddingHorizontal:responsiveWidth(7),
