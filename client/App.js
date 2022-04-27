@@ -7,18 +7,14 @@ import AppLoading from "expo-app-loading";
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import * as Font from "expo-font";
-
+import { Provider } from "react-redux";
+import store from "./src/redux/store";
 
 const Stack = createStackNavigator();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = React.useState(false);
 
-  // React.useEffect(() => {
-  //   if(!fontsLoaded){
-  //     fetchFonts()
-  //   }
-  // })
   const fetchFonts = async() => {
     console.log('fetching fonts');
     await Font.loadAsync({
@@ -26,7 +22,7 @@ export default function App() {
       "roboto-bold": require("./src/assets/fonts/Roboto-Bold.ttf"),
       
     });
-    // setFontsLoaded(true)
+    
   };
    if (!fontsLoaded) {
     return (
@@ -41,22 +37,19 @@ export default function App() {
     );
   }
   return (
-    
-    <NavigationContainer>
-
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animationEnabled: true,
-          
-      }}
-        >
-        
-            <Stack.Screen name="Home" component={Home} />
-         
-        
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            animationEnabled: true,
+            
+        }}
+          >
+            <Stack.Screen name="Home" component={Home} />        
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
     
   );
 }

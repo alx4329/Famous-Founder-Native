@@ -8,51 +8,42 @@ import DragZone from '../../components/DragZone.js';
 import * as ImagePicker from 'expo-image-picker'
 import camera from '../../assets/icons/photo_camera.png';
 import gallery from '../../assets/icons/gallery.png';
-const includeExtra = true;
+import { useDispatch, useSelector } from 'react-redux'
+import { setFamousImage } from '../../redux/reducer.js';
+
 const Home = ()=>{
     const [showModal, setShowModal] = React.useState(false);
-    const [ response, setResponse] = React.useState(null);
-    
+    let dispatch = useDispatch();
+    let image = useSelector(state=>state.famousImage);
+    React.useEffect(()=>{
+        console.log("IMAGE COMPONENT",image)
+    },[image])
     const [status, requestPermission] = ImagePicker.useCameraPermissions();
-
-    const openGallery = async()=>{
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-          });
-      
-          console.log(result);
-      
-          if (!result.cancelled) {
-            setResponse(result.uri);
-          }
-        };
+    const cameraOptions = {
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1
+    }
     
-        
-    const launchCamera=async()=>{
-        let result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-          });
-      
-          console.log(result);
-      
-          if (!result.cancelled) {
-            setResponse(result.uri);
-          }
+    
+    const openGallery = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({cameraOptions})
+        console.log(result)
+        if (!result.cancelled) dispatch(setFamousImage(result.uri))
+    }
 
+    const launchCamera = async () => {
+        const result= await ImagePicker.launchCameraAsync(cameraOptions)
+         console.log(result);
+            if (!result.cancelled) dispatch(setFamousImage(result.uri))
     }
     const openCamera =  async() =>{
         if(status.granted){
             launchCamera();
         } else{
             await ImagePicker.requestCameraPermissionsAsync()
-            launchCamera();
-            
+            launchCamera()
         }
         
     }
@@ -87,12 +78,10 @@ const Home = ()=>{
                     <View style={styles.modalPosition}>
                         <View style={styles.modalView}>
                             <View style={styles.topBar} />
-                            
-
                             <Text style={styles.modalTitle}>Selecciona una foto</Text>
                             <Pressable
                                 style={[styles.button]}
-                                onPress={openGallery}
+                                onPress={()=>openGallery()}
                             >
                                 <Image style={styles.icon} source={gallery} />
                                 <Text style={styles.textStyle}>Galeria de fotos</Text>
