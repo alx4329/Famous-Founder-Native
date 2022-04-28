@@ -1,85 +1,73 @@
 import React from 'react';
-import { StyleSheet, Text, View,Modal, Pressable, Image } from 'react-native';
+import { StyleSheet, Text, View,Modal, Pressable, Image , Platform} from 'react-native';
 import { responsiveHeight, responsiveWidth,} from "react-native-responsive-dimensions";
 import * as ImagePicker from 'expo-image-picker'
-import * as ImageManipulator from "expo-image-manipulator";
 import camera from '../assets/icons/photo_camera.png';
 import gallery from '../assets/icons/gallery.png';
 import { useDispatch, useSelector } from 'react-redux'
 import { setFamousImage } from '../redux/reducer.js';
+import axios from 'axios';
 
 const ChoosePicture = ({show}) => {
     let dispatch = useDispatch();
     let image = useSelector(state=>state.famousImage);
-    React.useEffect(()=>{
-        console.log("IMAGE COMPONENT",image)
+
+
+    React.useEffect(async()=>{
+        if(image){
+            let myHeaders = new Headers();
+            myHeaders.append("Nomada", "YzNmNzEyODYtYjlkZS00NjY3LTk5M2YtNDRlYzJkYTMxMDFk");
+            let file = new FormData();
+            file.append('file', {
+                name: 'image',
+                type: image.type,
+                uri: Platform.OS === 'ios' ? image.uri.replace('file://', '') : image.uri,
+              });
+            axios({
+                method: "post",
+                url: "https://whois.nomada.cloud/upload",
+                data:file,
+                headers: { "Content-Type": `multipart/form-data`,
+                            "Nomada":"YzNmNzEyODYtYjlkZS00NjY3LTk5M2YtNDRlYzJkYTMxMDFk"
+            },
+              })
+                .then(function (response) {
+                  //handle success
+                  console.log(response);
+                })
+                .catch(function (response) {
+                  //handle error
+                  console.log(response);
+                });
+
+        }
+
     },[image])
+
+
     const [status, requestPermission] = ImagePicker.useCameraPermissions();
     const cameraOptions = {
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
-        base64: true,
     }
-    const _compressImage = async (image, base64) => {
-        const desiredWidth = 500;
-        const desiredHeight = 500;
-        // let expectedImageSize = { width: 500, height: 500 };
-        let expectedImageSize = { width: image.width, height: image.height };
     
-        if (image.width > desiredWidth || image.height > desiredHeight) {
-          //try this one with an image taken from camera
-            const widthRatio = image.width / desiredWidth;
-            const heightRatio = image.height / desiredHeight;
-            const ratioToUse = Math.max(widthRatio, heightRatio)
-            expectedImageSize = {
-                width: image.width / ratioToUse,
-                height: image.height / ratioToUse,
-            };
-        }
-        const manipResult = await ImageManipulator.manipulateAsync(
-            image.localUri || image.uri,
-            [{ resize: expectedImageSize }],
-            { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64 }
-          );
-          return manipResult;
-        };
     const openGallery = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({cameraOptions})
         console.log("GALLERY URI", result.uri, result.base64)
         if (!result.cancelled) {
-            const compressedImage = await _compressImage(result, true);
-            const filename = compressedImage.uri.split("ImageManipulator/")[1];
-            let selectedFile;
-            if (compressedImage.base64) {
-                const base64 = compressedImage.base64;
-                selectedFile = {
-                uri: compressedImage.uri,
-                name: filename,
-                type: "image/JPEG",
-                base64,
-                };
-                dispatch(setFamousImage(selectedFile))
-
-            } else {
-                const selectedFile = {
-                uri: compressedImage.uri,
-                name: filename,
-                type: "image/JPEG",
-                };
-                dispatch(setFamousImage(selectedFile))
-            }
-                
-            
+            dispatch(setFamousImage(result))
             }
     }
-
+    
     const launchCamera = async () => {
         const result= await ImagePicker.launchCameraAsync(cameraOptions)
          console.log("camera result",result);
-            if (!result.cancelled) dispatch(setFamousImage(result))
-
+            if (!result.cancelled) {
+                // setUrl(result.uri)
+                dispatch(setFamousImage(result))
+            }
     }
     const openCamera =  async() =>{
         if(status.granted){
@@ -88,7 +76,6 @@ const ChoosePicture = ({show}) => {
             await ImagePicker.requestCameraPermissionsAsync()
             launchCamera()
         }
-        
     }
 
     return(
@@ -107,13 +94,12 @@ const ChoosePicture = ({show}) => {
                     <View style={styles.topBar} />
                     <Text style={styles.modalTitle}>Selecciona una foto</Text>
                         {
-                            image?.base64 &&
-                            <Image 
+                            image && <Image 
                             onLoadStart={()=>{console.log('cargando')}}
-                            source={!(image.base64).startsWith('data:image/jpeg;base64,')  ?  {uri:'data:image/jpeg;base64,' + image.base64 } : {uri:image.base64}} 
+                            source={ {uri:image.uri}} 
                             resizeMode="contain"
                             style={styles.modalImage}
-                            />
+                            />                            
                         }
                     <Pressable
                         style={[styles.button]}
