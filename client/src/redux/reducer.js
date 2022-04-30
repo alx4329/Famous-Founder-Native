@@ -1,10 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios';
-
+import {NOMADA_API_KEY, MOVIEDB_API_KEY} from "react-native-dotenv"
 const initialState={
     famousImage:null,
     response:{},
-    loading:false
+    loading:false, 
+    famousDetails:{},
+    error:null,
 }
 
 export const getFamousName = createAsyncThunk(
@@ -23,7 +25,7 @@ export const getFamousName = createAsyncThunk(
                 url: "https://whois.nomada.cloud/upload",
                 data:file,
                 headers: { "Content-Type": `multipart/form-data`,
-                            "Nomada":"YzNmNzEyODYtYjlkZS00NjY3LTk5M2YtNDRlYzJkYTMxMDFk"
+                            "Nomada":`${NOMADA_API_KEY}`,
             },
               })
             return quienEs.data
@@ -31,7 +33,26 @@ export const getFamousName = createAsyncThunk(
             return rejectWithValue([],e)
         }
     }
+    )
+    export const getFamousDetails = createAsyncThunk(
+        'getFamousDetails',
+        async ( name, {rejectWithValue})=>{
+            const BASE_URL = `https://api.themoviedb.org/3/search/person`
+        const API_KEY = `api_key=${MOVIEDB_API_KEY}`
+        const QUERY = `query=${name}`
+        try{
+            const details = await axios({
+                method: "get",
+                url: `${BASE_URL}?${API_KEY}&${QUERY}`,
+            })
+            console.log("DETAILS",details.data)
+            return details.data
+        }catch(e){
+            return rejectWithValue([],e)
+        }
+    }
 )
+
 const reducerSlice = createSlice({
     name: 'reducer',
     initialState: initialState,
@@ -56,6 +77,15 @@ const reducerSlice = createSlice({
         [getFamousName.rejected]: (state, {payload})=>{
             state.loading=false            
             state.response = payload
+        },
+        [getFamousDetails.pending]: (state)=>{
+            console.log("asking for details")
+        },
+        [getFamousDetails.fulfilled]: (state, {payload})=>{
+            state.famousDetails = payload
+        },
+        [getFamousDetails.rejected]: (state, {payload})=>{
+            state.error= payload
         }
     }
 })

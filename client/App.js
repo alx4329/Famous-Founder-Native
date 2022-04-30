@@ -1,7 +1,6 @@
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
+// require('dotenv').config()
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import Home  from './src/screens/Home/Home';
 import AppLoading from "expo-app-loading";
 import { createStackNavigator } from '@react-navigation/stack';

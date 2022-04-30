@@ -4,6 +4,5 @@ import reducer from "./reducer";
 import thunk from "redux-thunk";
 
 const store =configureStore({reducer:reducer});
-const useAppDispatch = () => store.dispatch
-export {useAppDispatch}
+
 export default store;

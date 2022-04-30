@@ -2,13 +2,13 @@ import React from 'react';
 import { StyleSheet, Text, View, Image, Pressable } from 'react-native';
 import { responsiveHeight, responsiveWidth,} from "react-native-responsive-dimensions";
 import { useDispatch, useSelector } from 'react-redux'
-import { cleanState } from '../redux/reducer';
+import { cleanState, getFamousDetails } from '../redux/reducer';
 
 const ImageToFind = ({ setShow})=>{
     
     const dispatch = useDispatch();
     let image = useSelector(state=>state.famousImage);
-    
+    let famousDetails=useSelector(state=>state.famousDetails);
     let response = useSelector(state=>state.response);
     const [title, setTitle] = React.useState('Subiendo...');
     const [actorName, setActorName] = React.useState('Buscando...');
@@ -20,6 +20,7 @@ const ImageToFind = ({ setShow})=>{
                 setActorName(response.actorName)
                 setTitle('Listo');
                 setColor('#4ADE80')
+                dispatch(getFamousDetails(response.actorName));
             } else if(response.error === "No sé quien es, intenta con otra foto"){
                     setTitle("¿Es un famoso?")
                     setActorName("No se encontró");
@@ -29,12 +30,14 @@ const ImageToFind = ({ setShow})=>{
                     setTitle("Hubo un error");
                     setColor("#F75555")        
             }        
-    }
-    
-},[response])
-
+        }    
+    },[response])
+    React.useEffect(()=>{
+        if(Object.keys(famousDetails).length>0){
+            console.log("famousDetails",famousDetails);
+        }
+    },[famousDetails])
     styles.status={
-    
     backgroundColor:color,
     padding:responsiveWidth(3),
     height:responsiveHeight(6),
