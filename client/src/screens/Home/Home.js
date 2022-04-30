@@ -24,7 +24,7 @@ const Home = ()=>{
                         <DragZone/>
                     </View>
                 </Pressable>
-                {showModal && <ChoosePicture show={showModal} />}
+                {showModal && <ChoosePicture show={showModal} setShow={setShowModal} />}
             
         </View>
         
