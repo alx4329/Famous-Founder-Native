@@ -11,26 +11,35 @@ const ImageToFind = ({ setShow, goToFamous})=>{
     let image = useSelector(state=>state.famousImage);
     let famousDetails=useSelector(state=>state.famousDetails);
     let response = useSelector(state=>state.response);
+    let error = useSelector(state=>state.error);
+
     const [title, setTitle] = React.useState('Subiendo...');
     const [actorName, setActorName] = React.useState('Buscando...');
     const [color, setColor] = React.useState('#3843D0');
-    React.useEffect(()=>{        
-        if(Object.keys(response).length>0){
-            if(response.actorName){
-                setActorName(response.actorName)
-                setTitle('Listo');
-                setColor('#4ADE80')
-                dispatch(getFamousDetails(response.actorName));
-            } else if(response.error === "No sé quien es, intenta con otra foto"){
-                    setTitle("¿Es un famoso?")
-                    setActorName("No se encontró");
-                    setColor("#FDE047")
-                }else {
-                    setActorName("Error de red o de servidor")
-                    setTitle("Hubo un error");
-                    setColor("#F75555")        
-            }        
-        }    
+    React.useEffect(()=>{
+        if(!error){
+            if(Object.keys(response).length>0){
+                if(response.actorName){
+                    setActorName(response.actorName)
+                    setTitle('Listo');
+                    setColor('#4ADE80')
+                    dispatch(getFamousDetails(response.actorName));
+                } else if(response.error === "No sé quien es, intenta con otra foto"){
+                        setTitle("¿Es un famoso?")
+                        setActorName("No se encontró");
+                        setColor("#FDE047")
+                    }else {
+                        setActorName("Error de red o de servidor")
+                        setTitle("Hubo un error");
+                        setColor("#F75555")        
+                    }        
+                }    
+            } else {
+                setActorName("Error de red o de servidor")
+                setTitle("Hubo un error");
+                setColor("#F75555")        
+
+        }     
     },[response])
     useFocusEffect(
         React.useCallback(()=>{

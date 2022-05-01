@@ -32,7 +32,8 @@ export const getFamousName = createAsyncThunk(
               console.log(quienEs.data)
             return quienEs.data
         }catch(e){
-            return rejectWithValue([],e)
+            console.log(e.error)
+            return {error:"Error al obtener el nombre"}
         }
     }
     )
@@ -50,7 +51,7 @@ export const getFamousName = createAsyncThunk(
             console.log("DETAILS",details.data)
             return details.data
         }catch(e){
-            return rejectWithValue([],e)
+            return rejectWithValue(e)
         }
     }
 )
@@ -72,15 +73,17 @@ const reducerSlice = createSlice({
     },
     extraReducers:{
         [getFamousName.pending]: (state)=>{
-            state.loading=true
+            console.log("pending")
         },
         [getFamousName.fulfilled ]: (state, {payload})=>{
             state.loading=false
             state.response = payload
+            state.error=null
         },
         [getFamousName.rejected]: (state, {payload})=>{
+
             state.loading=false            
-            state.response = payload
+            state.error = "Some sort of error"
         },
         [getFamousDetails.pending]: (state)=>{
             console.log("asking for details")
@@ -89,7 +92,7 @@ const reducerSlice = createSlice({
             state.famousDetails = payload
         },
         [getFamousDetails.rejected]: (state, {payload})=>{
-            state.error= payload
+            state.error= "Some sort of error"
         }
     }
 })
