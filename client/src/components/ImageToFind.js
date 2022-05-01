@@ -3,8 +3,9 @@ import { StyleSheet, Text, View, Image, Pressable } from 'react-native';
 import { responsiveHeight, responsiveWidth,} from "react-native-responsive-dimensions";
 import { useDispatch, useSelector } from 'react-redux'
 import { cleanState, getFamousDetails } from '../redux/reducer';
+import { useFocusEffect } from '@react-navigation/native';
 
-const ImageToFind = ({ setShow})=>{
+const ImageToFind = ({ setShow, goToFamous})=>{
     
     const dispatch = useDispatch();
     let image = useSelector(state=>state.famousImage);
@@ -13,7 +14,6 @@ const ImageToFind = ({ setShow})=>{
     const [title, setTitle] = React.useState('Subiendo...');
     const [actorName, setActorName] = React.useState('Buscando...');
     const [color, setColor] = React.useState('#3843D0');
-    
     React.useEffect(()=>{        
         if(Object.keys(response).length>0){
             if(response.actorName){
@@ -32,11 +32,15 @@ const ImageToFind = ({ setShow})=>{
             }        
         }    
     },[response])
-    React.useEffect(()=>{
-        if(Object.keys(famousDetails).length>0){
-            console.log("famousDetails",famousDetails);
-        }
-    },[famousDetails])
+    useFocusEffect(
+        React.useCallback(()=>{
+            if(Object.keys(famousDetails).length>0){
+                setShow(false);
+                goToFamous()
+            }
+        },[famousDetails])
+
+    )
     styles.status={
     backgroundColor:color,
     padding:responsiveWidth(3),
@@ -45,9 +49,7 @@ const ImageToFind = ({ setShow})=>{
     margin:responsiveWidth(2),
     }
 
-    const goToFamousDetails = ()=>{
-        console.log("YENDO")
-    }
+    
     return(
         <>
 
@@ -58,13 +60,10 @@ const ImageToFind = ({ setShow})=>{
                     resizeMode="contain"
                     style={styles.modalImage}
                 /> 
-                <Pressable
-                    onPress={response.actorName? goToFamousDetails : null}
-                    >
-                    <View style={styles.status}>
-                        <Text style={styles.textStyle} >{actorName}</Text>
-                    </View>
-                </Pressable>
+                <View style={styles.status}>
+                    <Text style={styles.textStyle} >{actorName}</Text>
+                </View>
+                
                 {
                     !response.actorName &&
                     <Pressable

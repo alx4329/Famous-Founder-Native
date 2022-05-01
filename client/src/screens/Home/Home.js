@@ -1,17 +1,26 @@
 import React from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Pressable,Image } from 'react-native';
 import { responsiveHeight, responsiveWidth,} from "react-native-responsive-dimensions";
 import DragZone from '../../components/DragZone.js';
 import ChoosePicture from '../../components/ChoosePicture.js';
+import handEmoji from '../../assets/icons/hi.png';
+import { useDispatch } from 'react-redux';
 
-const Home = ()=>{
+const Home = ({navigation})=>{
     const [showModal, setShowModal] = React.useState(false);
-   
+   const goToFamous = ()=>{
+       navigation.navigate('Famous');
+   }
 
     return(
         <View style={styles.container} >
             <View style={styles.header} >
-                <Text style={styles.heyText} >Hey, Dev</Text>
+                <View style={styles.saludo} >
+                    <Text style={styles.heyText} >Hey, Dev</Text>
+                    <Image
+                        source={handEmoji}
+                    />
+                </View>
                 <Text style={styles.headline} >Keep up the good work!</Text>
             </View>
             <View style={styles.body} >
@@ -24,7 +33,12 @@ const Home = ()=>{
                         <DragZone/>
                     </View>
                 </Pressable>
-                {showModal && <ChoosePicture show={showModal} setShow={setShowModal} />}
+                {showModal && <ChoosePicture 
+                                    show={showModal} 
+                                    setShow={setShowModal}
+                                    goToFamous={()=>goToFamous()}
+                                />
+                }
             
         </View>
         
@@ -45,6 +59,10 @@ const styles = StyleSheet.create({
     },
     header:{
 
+    },
+    saludo:{
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
     },
     dragzone:{
         height:responsiveHeight(20),

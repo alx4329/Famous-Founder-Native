@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 // require('dotenv').config()
 import React from 'react';
 import Home  from './src/screens/Home/Home';
+import FamousScreen from './src/screens/FamousDetails/FamousDetails';
 import AppLoading from "expo-app-loading";
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -45,7 +46,8 @@ export default function App() {
             
         }}
           >
-            <Stack.Screen name="Home" component={Home} />        
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Famous" component = {FamousScreen} />    
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

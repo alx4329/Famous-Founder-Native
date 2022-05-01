@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { Platform } from 'react-native';
 import axios from 'axios';
 import {NOMADA_API_KEY, MOVIEDB_API_KEY} from "react-native-dotenv"
+
 const initialState={
     famousImage:null,
     response:{},
-    loading:false, 
     famousDetails:{},
     error:null,
 }
@@ -28,6 +29,7 @@ export const getFamousName = createAsyncThunk(
                             "Nomada":`${NOMADA_API_KEY}`,
             },
               })
+              console.log(quienEs.data)
             return quienEs.data
         }catch(e){
             return rejectWithValue([],e)
@@ -62,7 +64,9 @@ const reducerSlice = createSlice({
         },
         cleanState: (state, action) => {
             state.famousImage = null,
-            state.response = {}
+            state.response = {},
+            state.famousDetails={},
+            state.error=null
 
         }
     },

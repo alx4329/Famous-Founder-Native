@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View,Modal, Pressable, Image} from 'react-native';
+import { StyleSheet, Text, View,Modal, Pressable, Image, Platform} from 'react-native';
 import { responsiveHeight, responsiveWidth,} from "react-native-responsive-dimensions";
 import * as ImagePicker from 'expo-image-picker'
 import camera from '../assets/icons/photo_camera.png';
@@ -9,7 +9,7 @@ import { getFamousName, setFamousImage } from '../redux/reducer.js';
 import ImageToFind from './ImageToFind';
 
 
-const ChoosePicture = ({show,setShow}) => {
+const ChoosePicture = ({show,setShow,goToFamous}) => {
     let dispatch = useDispatch();
     let image = useSelector(state=>state.famousImage);
 
@@ -31,6 +31,7 @@ const ChoosePicture = ({show,setShow}) => {
     
     const openGallery = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({cameraOptions})
+        console.log(result)
         if (!result.cancelled) {
             dispatch(setFamousImage(result))
             }
@@ -94,6 +95,7 @@ const ChoosePicture = ({show,setShow}) => {
                         <>
                         <ImageToFind
                             setShow={setShow}
+                            goToFamous={goToFamous}
                         >
                         </ImageToFind>
                         </>
