@@ -8,10 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 const ImageToFind = ({ setShow, goToFamous})=>{
     
     const dispatch = useDispatch();
-    let image = useSelector(state=>state.famousImage);
-    let famousDetails=useSelector(state=>state.famousDetails);
-    let response = useSelector(state=>state.response);
-    let error = useSelector(state=>state.error);
+    let {famousDetails, famousImage,error,response} = useSelector(state => state);
 
     const [title, setTitle] = React.useState('Subiendo...');
     const [actorName, setActorName] = React.useState('Buscando...');
@@ -65,7 +62,7 @@ const ImageToFind = ({ setShow, goToFamous})=>{
                 <Text style={styles.modalTitle} >{title}</Text>
                 <Image 
                     onLoadStart={()=>{console.log('cargando')}}
-                    source={ {uri:image.uri}} 
+                    source={ {uri:famousImage.uri}} 
                     resizeMode="contain"
                     style={styles.modalImage}
                 /> 
