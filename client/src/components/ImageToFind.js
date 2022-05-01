@@ -71,7 +71,7 @@ const ImageToFind = ({ setShow, goToFamous})=>{
                 </View>
                 
                 {
-                    !response.actorName &&
+                    Object.keys(response).length>0 && !response.actorName &&
                     <Pressable
                         onPress={()=>{
                             dispatch(cleanState())
